@@ -93,20 +93,21 @@ jobs:
         echo "Detected Godot version: $VERSION"
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
-    - name: Preparation for export
+    - name: Export (Godot v3)
       run: |
         mkdir -p export
         EXT=${{ fromJSON(env.EXTS)[env.PLATFORM] || '.zip' }}
         echo "EXT=${EXT}" >> $GITHUB_ENV
-
-    - name: Export
-      if: contains(env.VERSION, 'v3')
-      run: |
-        godot --no-window --export "$PLATFORM" export/$FILENAME$EXT
-      else if: contains(env.VERSION, 'v4')
-      run: |
-        godot --headless --export-release "$PLATFORM" export/$FILENAME$EXT
-
+        VERSION=$(godot --version)
+        echo "version: $VERSION"
+        if [[ $VERSION =~ v3\.[0-9]+ ]]; then
+          echo "Godot version 3.x detected"
+          godot --no-window --export "$PLATFORM" export/$FILENAME$EXT
+        elif [[ $VERSION =~ v4\.[0-9]+ ]]; then
+          echo "Godot version 4.x detected"
+          godot --headless --export-release "$PLATFORM" export/$FILENAME$EXT
+        fi
+        
     - name: Upload result to artifact
       uses: actions/upload-artifact@v4
       with:
