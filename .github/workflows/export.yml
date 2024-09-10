@@ -88,22 +88,22 @@ jobs:
         keytool -genkey -v -keystore key.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.STOREPASS }} -keypass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
 
     - name: Check Version
-      run: |
+    - run: |
         VERSION=$(godot --version)
         echo "Detected Godot version: $VERSION"
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
-    - name: Export (Godot v3)
+    - name: Export
       run: |
         mkdir -p export
         EXT=${{ fromJSON(env.EXTS)[env.PLATFORM] || '.zip' }}
         echo "EXT=${EXT}" >> $GITHUB_ENV
         VERSION=$(godot --version)
         echo "version: $VERSION"
-        if [[ $VERSION =~ v3\.[0-9]+ ]]; then
+        if [[ $VERSION =~ 3\.[0-9]+ ]]; then
           echo "Godot version 3.x detected"
           godot --no-window --export "$PLATFORM" export/$FILENAME$EXT
-        elif [[ $VERSION =~ v4\.[0-9]+ ]]; then
+        elif [[ $VERSION =~ 4\.[0-9]+ ]]; then
           echo "Godot version 4.x detected"
           godot --headless --export-release "$PLATFORM" export/$FILENAME$EXT
         fi
